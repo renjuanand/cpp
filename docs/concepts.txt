@@ -1,0 +1,124 @@
+
+* Processes & Threads
+
+    Per process items             | Per thread items
+    ------------------------------|-----------------
+    Address space                 | Program counter
+    Global variables              | Registers
+    Open files                    | Stack
+    Child processes               | State
+    Pending alarms                |
+    Signals and signal handlers   |
+    Accounting information        |
+
+* Data races
+
+Race conditions are typically cured by adding a lock that protects
+the invariant that might otherwise be violated by interleaved operations.
+
+* Deadlock
+
+- Thread 1 has acquired lock A
+- Thread 2 has acquired lock B
+- Each thread is trying to acquire the other lock
+- Neither thread can proceed
+
+  Deadlock can occur only if the following four conditions hold true:
+
+  - Access to each resource is exclusive.
+  - A thread is allowed to hold one resource while requesting another.
+  - No thread is willing to relinquish a resource that it has acquired.
+  - There is a cycle of threads trying to acquire resources, where each resource is held by one thread and requested by another.
+
+
+Deadlock: A situation in which two or more processes are unable to proceed because each is waiting for one the others to do something.
+
+For example, consider two processes, P1 and P2, and two resources, R1 and R2. Suppose that each process needs access to both resources to perform part of its function. Then it is possible to have the following situation: the OS assigns R1 to P2, and R2 to P1. Each process is waiting for one of the two resources. Neither will release the resource that it already owns until it has acquired the other resource and performed the function requiring both resources. The two processes are deadlocked
+
+Livelock: A situation in which two or more processes continuously change their states in response to changes in the other process(es) without doing any useful work:
+
+Starvation: A situation in which a runnable process is overlooked indefinitely by the scheduler; although it is able to proceed, it is never chosen.
+
+Suppose that three processes (P1, P2, P3) each require periodic access to resource R. Consider the situation in which P1 is in possession of the resource, and both P2 and P3 are delayed, waiting for that resource. When P1 exits its critical section, either P2 or P3 should be allowed access to R. Assume that the OS grants access to P3 and that P1 again requires access before P3 completes its critical section. If the OS grants access to P1 after P3 has finished, and subsequently alternately grants access to P1 and P3, then P2 may indefinitely be denied access to the resource, even though there is no deadlock situation.
+
+
+Deadlock Example
+-----------------
+If both processes set their flags to true before either has executed the while statement, then each will think that the other has entered its critical section, causing deadlock.
+
+/* PROCESS 0 */
+flag[0] = true; 
+while (flag[1]) 
+    /* do nothing */; 
+/* critical section*/; 
+flag[0] = false; 
+
+ /* PROCESS 1 */
+flag[1] = true;
+while (flag[0])
+    /* do nothing */;
+/* critical section*/;
+flag[1] = false;
+
+Livelock Example
+----------------
+/* PROCESS 0 */
+flag[0] = true; 
+while (flag[1]){
+    flag[0] = false; 
+    /*delay */;
+    flag[0] = true;
+}
+/*critical section*/;
+flag[0] = false; 
+
+/* PROCESS 1 */
+flag[1] = true;
+while (flag[0]) {
+    flag[1] = false;
+    /*delay */;
+    flag[1] = true;
+}
+/* critical section*/;
+flag[1] = false;
+
+
+
+* Reentrance
+
+  - A reentrant function does not hold static data over successive calls,
+    nor does it return a pointer to static data.
+  - All data is provided by the caller of the function.
+  - A reentrant function must not call non-reentrant functions.
+
+C++11 - threading support
+------------------------
+
+headers -   <thread>, <mutex>, <condition_variable>, <future>
+            <chrono>
+
+* packaged_task
+
+  - Class template std::packaged_task wraps any callable object (lambda express, function object, bind expression)
+    so that it can be invoked asynchronously and its return value or exception thrown is stored in a
+    shared state which can be accessed through std::future objects.
+
+    packaged_task won't start on its own, we need to invoke it
+
+    auto sleep = []() {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        return 1;
+    }
+
+    std::packaged_task<int()> task(sleep);
+    auto f = task.get_future();
+    task(); //  invoke task
+
+    std::cout << f.get() << std::endl;
+
+* async
+
+  - std::async with launch::async will try to run the task in a different thread.
+
+    auto f = std::async(std::launch::async, sleep);
+    std::cout << f.get() << std::endl;

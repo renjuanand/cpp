@@ -1,0 +1,10 @@
+
+* Promise and Future
+
+- The promise is an object that can store a value of type T tobe retrieved by a future object
+  (possibly in another thread) offering a synchronization point.
+
+- The promise object is asynchronous provider and is expected to set a value for a
+  shared state at some point.
+- The future object is an asynchronous return object that can retrieve the value of
+  the shared state, waiting for it to be ready, if necessary.

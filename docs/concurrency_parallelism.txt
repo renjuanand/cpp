@@ -1,0 +1,15 @@
+
+* Concurrency
+
+  - Concurrency means that an application is making progress on more than
+    one task at the same time (concurrently). If the computer only has
+    one CPU the application may not make progress on more than one task
+    at exactly the same time, but more than one task is being processed
+    at a time inside the application. It does not completely finish one
+    task before it begins the next.
+
+* Parallelism
+
+  - Parallelism means that an application splits its tasks up into smaller
+    subtasks which can be processed in parallel, for instance on multiple
+    CPUs at the exact same time.
